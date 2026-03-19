@@ -1,42 +1,73 @@
-let bootcamps = [];
-let idCounter = 1;
+const Bootcamp = require('../models/Bootcamp');
 
-exports.getBootcamps = (req, res) => {
-  res.json(bootcamps);
-};
-
-exports.createBootcamp = (req, res) => {
-  const newBootcamp = {
-    id: idCounter++,
-    name: req.body.name
-  };
-
-  bootcamps.push(newBootcamp);
-  res.json(newBootcamp);
-};
-
-exports.getBootcampById = (req, res) => {
-  const bootcamp = bootcamps.find(b => b.id == req.params.id);
-
-  if (!bootcamp) {
-    return res.status(404).json({ message: 'Not found' });
+// GET all bootcamps
+exports.getBootcamps = async (req, res) => {
+  try {
+    const bootcamps = await Bootcamp.find();
+    res.json(bootcamps);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-
-  res.json(bootcamp);
 };
 
-exports.updateBootcamp = (req, res) => {
-  const bootcamp = bootcamps.find(b => b.id == req.params.id);
+// CREATE bootcamp
+exports.createBootcamp = async (req, res) => {
+  try {
+    const bootcamp = await Bootcamp.create({
+      name: req.body.name
+    });
 
-  if (!bootcamp) {
-    return res.status(404).json({ message: 'Not found' });
+    res.json(bootcamp);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-
-  bootcamp.name = req.body.name;
-  res.json(bootcamp);
 };
 
-exports.deleteBootcamp = (req, res) => {
-  bootcamps = bootcamps.filter(b => b.id != req.params.id);
-  res.json({ message: 'Deleted successfully' });
+// GET by ID
+exports.getBootcampById = async (req, res) => {
+  try {
+    const bootcamp = await Bootcamp.findById(req.params.id);
+
+    if (!bootcamp) {
+      return res.status(404).json({ message: 'Not found' });
+    }
+
+    res.json(bootcamp);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// UPDATE
+exports.updateBootcamp = async (req, res) => {
+  try {
+    const bootcamp = await Bootcamp.findByIdAndUpdate(
+      req.params.id,
+      { name: req.body.name },
+      { new: true }
+    );
+
+    if (!bootcamp) {
+      return res.status(404).json({ message: 'Not found' });
+    }
+
+    res.json(bootcamp);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// DELETE
+exports.deleteBootcamp = async (req, res) => {
+  try {
+    const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+
+    if (!bootcamp) {
+      return res.status(404).json({ message: 'Not found' });
+    }
+
+    res.json({ message: 'Deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };

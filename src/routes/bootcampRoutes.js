@@ -15,4 +15,4 @@ router.get('/:id', getBootcampById);
 router.put('/:id', updateBootcamp);
 router.delete('/:id', deleteBootcamp);
 
-module.exports = router; // 🔥 MUST BE THERE
+module.exports = router;

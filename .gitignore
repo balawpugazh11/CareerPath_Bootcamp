@@ -49,3 +49,6 @@ logs/
 .cache/
 temp/
 tmp/
+
+# Documentation (local reference only - not committed)
+docs/

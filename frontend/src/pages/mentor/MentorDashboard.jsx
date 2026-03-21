@@ -1,11 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Users, FileCheck, MessageSquare } from 'lucide-react';
+import { mentorDashboard } from '../../data/platformData';
 
 export default function MentorDashboard() {
-  const submissions = [
-    { id: 1, student: 'Alice Johnson', assignment: 'Build a REST API', date: '2 hours ago', status: 'Pending Review' },
-    { id: 2, student: 'Bob Smith', assignment: 'React Portfolio', date: '5 hours ago', status: 'Pending Review' },
-  ];
+  const { submissions, assignedStudents, responseSla } = mentorDashboard;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -17,7 +16,7 @@ export default function MentorDashboard() {
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="p-4 bg-indigo-50 text-indigo-600 rounded-xl"><Users className="w-8 h-8"/></div>
           <div>
-            <div className="text-2xl font-bold text-gray-900">24</div>
+            <div className="text-2xl font-bold text-gray-900">{assignedStudents}</div>
             <div className="text-gray-500 text-sm font-medium">Assigned Students</div>
           </div>
         </div>
@@ -26,6 +25,13 @@ export default function MentorDashboard() {
           <div>
             <div className="text-2xl font-bold text-gray-900">{submissions.length}</div>
             <div className="text-gray-500 text-sm font-medium">Pending Reviews</div>
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+          <div className="p-4 bg-emerald-50 text-emerald-600 rounded-xl"><MessageSquare className="w-8 h-8"/></div>
+          <div>
+            <div className="text-2xl font-bold text-gray-900">{responseSla}</div>
+            <div className="text-gray-500 text-sm font-medium">Average Response SLA</div>
           </div>
         </div>
       </div>
@@ -46,11 +52,17 @@ export default function MentorDashboard() {
               <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{sub.student}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-gray-500">{sub.assignment}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-sm">{sub.date}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-sm">
+                  <div>{sub.date}</div>
+                  <div className="text-xs uppercase tracking-[0.2em] text-indigo-500 mt-1">{sub.status}</div>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1.5 rounded-lg flex items-center gap-1.5 ml-auto">
+                  <Link
+                    to={`/mentor/review/${sub.reviewId}`}
+                    className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1.5 rounded-lg flex items-center gap-1.5 ml-auto"
+                  >
                     <MessageSquare className="w-4 h-4"/> Review
-                  </button>
+                  </Link>
                 </td>
               </tr>
             ))}

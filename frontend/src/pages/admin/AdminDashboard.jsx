@@ -1,11 +1,9 @@
 import React from 'react';
 import { LayoutDashboard, BookText, Settings, Plus } from 'lucide-react';
+import { adminDashboard } from '../../data/platformData';
 
 export default function AdminDashboard() {
-  const bootcamps = [
-    { id: 1, title: 'Full Stack Web Development', students: 120, status: 'Active' },
-    { id: 2, title: 'Data Science Bootcamp', students: 85, status: 'Draft' },
-  ];
+  const { bootcamps, metrics } = adminDashboard;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -16,8 +14,16 @@ export default function AdminDashboard() {
         </button>
       </div>
 
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
+        {metrics.map((metric) => (
+          <div key={metric.label} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="text-3xl font-black text-gray-900">{metric.value}</div>
+            <div className="mt-2 text-sm font-medium text-gray-500">{metric.label}</div>
+          </div>
+        ))}
+      </div>
+
       <div className="grid lg:grid-flow-col gap-8">
-        {/* Sidebar Nav (dummy) */}
         <div className="col-span-1 lg:w-64 space-y-2">
           <div className="bg-blue-50 text-blue-700 px-4 py-3 rounded-lg font-bold flex items-center gap-3 cursor-pointer">
             <LayoutDashboard className="w-5 h-5"/> Overview
@@ -30,7 +36,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="lg:col-span-3">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Manage Bootcamps</h2>
           <div className="grid gap-4">

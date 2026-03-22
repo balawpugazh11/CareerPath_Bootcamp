@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CalendarDays, CheckCircle2, CreditCard, ShieldCheck, Users } from 'lucide-react';
-import { bootcamps } from '../data/platformData';
+import { useBootcamps } from '../hooks/useBootcamps';
 
 const enrollmentSteps = [
   'Choose your preferred payment option',
@@ -11,6 +11,7 @@ const enrollmentSteps = [
 
 export default function Enrollment() {
   const { id } = useParams();
+  const { bootcamps } = useBootcamps();
   const bootcamp = bootcamps.find((item) => item.id === id) ?? bootcamps[0];
 
   return (

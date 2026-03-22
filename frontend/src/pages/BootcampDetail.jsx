@@ -1,10 +1,11 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, CheckCircle, Video, Star } from 'lucide-react';
-import { bootcamps } from '../data/platformData';
+import { useBootcamps } from '../hooks/useBootcamps';
 
 export default function BootcampDetail() {
   const { id } = useParams();
+  const { bootcamps } = useBootcamps();
   const bootcamp = bootcamps.find((item) => item.id === id) ?? bootcamps[0];
 
   return (

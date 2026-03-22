@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Clock, Star, TrendingUp } from 'lucide-react';
-import { bootcamps, platformStats, testimonials } from '../data/platformData';
+import { platformStats, testimonials } from '../data/platformData';
+import { useBootcamps } from '../hooks/useBootcamps';
 
 export default function Home() {
+  const { bootcamps, loading, usingFallback } = useBootcamps();
+
   return (
     <div className="pb-16">
       <section className="relative overflow-hidden bg-slate-950 text-white">
@@ -94,6 +97,18 @@ export default function Home() {
             Every track includes live reviews, milestone-based progression, and a finish line tied to portfolio or hiring outcomes.
           </p>
         </div>
+
+        {loading ? (
+          <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            Loading bootcamps from the backend...
+          </div>
+        ) : null}
+
+        {!loading && usingFallback ? (
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Backend bootcamps are unavailable right now, so this page is showing local demo data.
+          </div>
+        ) : null}
 
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
           {bootcamps.map((bootcamp) => (

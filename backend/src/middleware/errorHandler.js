@@ -1,20 +1,14 @@
-/**
- * Global error handling middleware
- * Must be the last middleware in the app
- */
 const errorHandler = (err, req, res, next) => {
   console.error('Error Handler Caught:', {
     message: err.message,
     stack: err.stack,
     url: req.url,
-    method: req.method
+    method: req.method,
   });
 
-  // Default error status and message
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Internal Server Error';
 
-  // Handle specific error types
   if (err.name === 'ValidationError') {
     statusCode = 400;
     message = 'Validation Error';
@@ -32,8 +26,11 @@ const errorHandler = (err, req, res, next) => {
 
   res.status(statusCode).json({
     success: false,
-    message: message,
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error'
+    message,
+    error:
+      process.env.NODE_ENV === 'development'
+        ? err.message
+        : 'Internal Server Error',
   });
 };
 

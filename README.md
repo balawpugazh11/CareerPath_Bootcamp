@@ -1,15 +1,15 @@
 # CareerPath Bootcamp
 
-Full-stack bootcamp platform built with a Node.js/Express backend and a React/Vite frontend.
+Full-stack bootcamp platform with a React/Vite frontend and an Express/MongoDB backend.
 
 ## Project Structure
 
 ```text
 .
-|-- backend/   - Express API and MongoDB integration
-|-- frontend/  - React application built with Vite
-|-- BOOTCAMP-BACKEND-INTEGRATION/        - older backend reference folder
-`-- CareerPath_Bootcamp-frontend-ui/     - older frontend reference folder
+|-- frontend/  - React application
+|-- backend/   - Express API
+|-- BOOTCAMP-BACKEND-INTEGRATION/    - legacy backend reference
+`-- CareerPath_Bootcamp-frontend-ui/ - legacy frontend reference
 ```
 
 ## Setup
@@ -31,10 +31,6 @@ npm install
 npm run dev
 ```
 
-## Environment Variables
+## Notes
 
-Create a `.env` file in `backend/` using `backend/.env.example` as the template.
-
-## Branch
-
-This repository is using the `fullstack` branch for integrated development.
+Use `backend/.env.example` to create the backend `.env` file.

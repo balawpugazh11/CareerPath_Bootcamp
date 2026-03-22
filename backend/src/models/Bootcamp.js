@@ -9,15 +9,14 @@ const bootcampSchema = new mongoose.Schema(
       minlength: [3, 'Bootcamp name must be at least 3 characters long'],
       maxlength: [100, 'Bootcamp name cannot exceed 100 characters'],
       unique: [true, 'Bootcamp name must be unique'],
-      index: true
-    }
+      index: true,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
-// Index for better query performance
 bootcampSchema.index({ createdAt: -1 });
 bootcampSchema.index({ name: 'text' });
 

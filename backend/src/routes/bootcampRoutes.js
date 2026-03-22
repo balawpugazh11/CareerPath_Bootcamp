@@ -1,40 +1,33 @@
 const express = require('express');
-const router = express.Router();
 
 const {
   getBootcamps,
   createBootcamp,
   getBootcampById,
   updateBootcamp,
-  deleteBootcamp
+  deleteBootcamp,
 } = require('../controllers/bootcampController');
-
 const {
   bootcampValidationRules,
   bootcampIdValidationRules,
-  handleValidationErrors
+  handleValidationErrors,
 } = require('../middleware/validation');
 
-// GET all bootcamps
-router.get('/', getBootcamps);
+const router = express.Router();
 
-// CREATE bootcamp with validation
+router.get('/', getBootcamps);
 router.post(
   '/',
   bootcampValidationRules(),
   handleValidationErrors,
   createBootcamp
 );
-
-// GET bootcamp by ID with validation
 router.get(
   '/:id',
   bootcampIdValidationRules(),
   handleValidationErrors,
   getBootcampById
 );
-
-// UPDATE bootcamp with validation
 router.put(
   '/:id',
   bootcampIdValidationRules(),
@@ -42,8 +35,6 @@ router.put(
   handleValidationErrors,
   updateBootcamp
 );
-
-// DELETE bootcamp with validation
 router.delete(
   '/:id',
   bootcampIdValidationRules(),

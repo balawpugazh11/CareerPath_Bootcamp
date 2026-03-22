@@ -1,55 +1,40 @@
-# Bootcamp Platform - Fullstack
+# CareerPath Bootcamp
 
-This is a fullstack bootcamp management platform with a Node.js/Express backend and a React/Vite frontend.
+Full-stack bootcamp platform built with a Node.js/Express backend and a React/Vite frontend.
 
 ## Project Structure
 
-```
+```text
 .
-├── BOOTCAMP-BACKEND-INTEGRATION/  - Node.js/Express backend API
-│   ├── src/
-│   │   ├── server.js             - Main server entry point
-│   │   ├── config/               - Database configuration
-│   │   ├── controllers/          - Request handlers
-│   │   ├── middleware/           - Express middleware
-│   │   ├── models/               - MongoDB models
-│   │   ├── routes/               - API routes
-│   │   └── utils/                - Utility functions
-│   ├── package.json
-│   └── .env.example              - Environment variables template
-│
-└── CareerPath_Bootcamp-frontend-ui/  - React/Vite frontend application
-    └── frontend/
-        ├── src/
-        │   ├── components/       - React components
-        │   ├── pages/           - Page components
-        │   ├── App.jsx          - Main app component
-        │   └── main.jsx         - Entry point
-        ├── package.json
-        └── vite.config.js       - Vite configuration
+|-- backend/   - Express API and MongoDB integration
+|-- frontend/  - React application built with Vite
+|-- BOOTCAMP-BACKEND-INTEGRATION/        - older backend reference folder
+`-- CareerPath_Bootcamp-frontend-ui/     - older frontend reference folder
 ```
 
-## Setup Instructions
+## Setup
 
 ### Backend
+
 ```bash
-cd BOOTCAMP-BACKEND-INTEGRATION
-cp .env.example .env
+cd backend
+copy .env.example .env
 npm install
 npm start
 ```
 
 ### Frontend
+
 ```bash
-cd CareerPath_Bootcamp-frontend-ui/frontend
+cd frontend
 npm install
 npm run dev
 ```
 
 ## Environment Variables
 
-Create `.env` files in each project directory using the provided `.env.example` files as templates.
+Create a `.env` file in `backend/` using `backend/.env.example` as the template.
 
-## Git Branch
+## Branch
 
-This project is on the `fullstack` branch. Use this branch for fullstack development.
+This repository is using the `fullstack` branch for integrated development.

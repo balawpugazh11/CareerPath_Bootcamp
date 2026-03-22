@@ -7,9 +7,7 @@ Full-stack bootcamp platform with a React/Vite frontend and an Express/MongoDB b
 ```text
 .
 |-- frontend/  - React application
-|-- backend/   - Express API
-|-- BOOTCAMP-BACKEND-INTEGRATION/    - legacy backend reference
-`-- CareerPath_Bootcamp-frontend-ui/ - legacy frontend reference
+`-- backend/   - Express API
 ```
 
 ## Setup

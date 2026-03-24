@@ -15,12 +15,16 @@ const {
   handleValidationErrors
 } = require('../middleware/validation');
 
+const { protect, authorize } = require('../middleware/authMiddleware');
+
 // GET all bootcamps
 router.get('/', getBootcamps);
 
 // CREATE bootcamp with validation
 router.post(
   '/',
+  protect,
+  authorize('admin'),
   bootcampValidationRules(),
   handleValidationErrors,
   createBootcamp
@@ -37,6 +41,8 @@ router.get(
 // UPDATE bootcamp with validation
 router.put(
   '/:id',
+  protect,
+  authorize('admin'),
   bootcampIdValidationRules(),
   bootcampValidationRules(),
   handleValidationErrors,
@@ -46,6 +52,8 @@ router.put(
 // DELETE bootcamp with validation
 router.delete(
   '/:id',
+  protect,
+  authorize('admin'),
   bootcampIdValidationRules(),
   handleValidationErrors,
   deleteBootcamp

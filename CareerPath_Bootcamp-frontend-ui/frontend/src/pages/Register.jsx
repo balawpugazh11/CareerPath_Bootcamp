@@ -23,7 +23,7 @@ export default function Register() {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      navigate('/student'); // Default mapping to student dashboard on register
+      navigate('/dashboard'); // Default mapping to student dashboard on register
     } catch (err) {
       setErrorMsg(err.message);
     }

@@ -1,0 +1,25 @@
+# Bugs Found, Reasons, and Solutions
+
+During the audit of the application's foundational layout and backend logic, several critical functional bugs were discovered and resolved to ensure the build matched a production-ready environment.
+
+---
+
+## Bug 1: Unprotected Checkout and Data Endpoints
+*   **The Bug:** The backend server stubbed out several core data manipulation endpoints (like `/api/bootcamps/:id/enroll`) but neglected to secure them. Any external request (even unauthenticated) could trigger these system changes.
+*   **The Reason:** The endpoints were placed inside `server.js` purely as placeholders before the security architecture was built.
+*   **The Solution:** An `authMiddleware.js` module was authored containing `protect` (JWT validation) and `authorize` (Role checking). We imported this middleware and bound it to the Express router configurations, requiring valid headers for sensitive endpoints.
+
+## Bug 2: Dead-End Navigation After Authentication
+*   **The Bug:** Upon successfully registering (`Register.jsx`) or logging in (`Login.jsx`), users were automatically routed to `/student`. However, a `/student` route did not exist in the React Router (`App.jsx`), generating a blank UI or a dead end.
+*   **The Reason:** A hardcoded routing typo during the initial UI wireframing process; the developer intended for the generalized learner dashboard to exist at `/student` but actually created it at `/dashboard`.
+*   **The Solution:** The `useNavigate()` hook triggers inside the `handleLogin` and `handleRegister` functions were refactored to check the user's role payload dynamically (`admin` vs `mentor` vs `student`) and redirect them respectively to `/admin`, `/mentor`, or the generalized `/dashboard`.
+
+## Bug 3: Dummy Enrollment Action
+*   **The Bug:** Inside the `.jsx` codebase, the "Confirm Enrollment" button on the checkout preview merely acted as static styling. Clicking it outputted dummy text ("Demo frontend flow only.") without triggering any interaction.
+*   **The Reason:** It had not yet been wired up to the API endpoint due to missing authentication hooks.
+*   **The Solution:** An asynchronous `handleEnroll` execution function was authored in React. It fetches the user's secure token from `localStorage`, opens a secure `fetch` `POST` request to the express backend, parses the success logic natively, renders a short transitional success prompt, and utilizes a `setTimeout` hook to route the user gracefully back to their learning dashboard after enrollment completes.
+
+## Bug 4: Static Navigation Bar
+*   **The Bug:** The `Navbar.jsx` permanently displayed "Log In" and "Sign Up," even if the user had just successfully authenticated and was browsing their dashboard.
+*   **The Reason:** The component was purely presentational and lacked state awareness.
+*   **The Solution:** A logical check was implemented by interpreting the existing `token` from `localStorage`. Using React conditional rendering (`{token ? ( ... ) : ( ... )}`), the navbar seamlessly swaps the authentication buttons for a contextual role-based dashboard link and a working `Log Out` button function that correctly flushes local storage and reloads the homepage.

@@ -1,0 +1,32 @@
+PATH4CAREER BUILD - TLDR SUMMARY
+
+1. WHAT WE BUILT (THE ARCHITECTURE)
+   We built a Full-Stack Web Application using a modified MERN stack (MongoDB, Express, React, Node).
+   - The Backend acts as a REST API handling business logic and database queries using the MVC (Model-View-Controller) pattern.
+   - The Frontend is a React Single Page Application (SPA). It uses "pages" for views and "components" for reusable UI logic like Navbars. React Router handles all the screen navigating instantly without reloading the browser.
+
+2. HOW SYSTEM SECURITY & AUTHENTICATION WORKS
+   To prove you know what you built, always mention JWTs and bcrypt.
+   - Passwords are never saved as plain text. We use "bcrypt" to heavily scramble (hash) them before saving them to MongoDB.
+   - When users log in, the backend verifies their password and gives them a "JSON Web Token" (JWT).
+   - The React frontend saves this token in "localStorage" and passes it back to the server as an HTTP Header to prove who they are on future clicks (like Enrolling).
+
+3. HOW WE CONTROL WHO SEES WHAT (RBAC)
+   We built Role-Based Access Control (RBAC) so Students, Mentors, and Admins cannot see each other's data.
+   - Backend Protection: We created an "authMiddleware" function that acts as a bouncer. Even if someone guesses the API URL, if they don't send a valid JWT token, the server blocks them (401 error).
+   - Frontend Protection: We built a custom React <ProtectedRoute> component. It intercepts the user trying to visit `/admin`, checks their role in localStorage, and kicks them back to `/dashboard` instantly if they are just a student.
+
+4. BUGS WE FIXED TO MAKE IT PROD-READY
+   - Fake Buttons: The "Confirm Enrollment" checkout button was just a visual dummy. We wired it up to do a real `fetch()` POST request to the backend.
+   - Broken Redirects: The authentication was sending people to a non-existent `/student` URL. We refactored it to successfully check their role and send them to the correct `/dashboard`.
+   - Exposed API: The backend endpoints were dangerously exposed. We applied our custom JWT middleware to lock them down.
+
+5. HOW IT WAS TESTED (QA & EDGE CASES)
+   An automated AI QA agent (simulating a real human) tested the site end-to-end.
+   - SUCCESS: A test user was registered, successfully routed to the dashboard, browsed the catalog, and successfully completed the checkout and enrollment API call.
+   - EDGE CASES HANDLED: Anonymous users trying to hit protected endpoints are blocked. Students trying to type `/admin` in the URL bar are redirected safely. The navigation bar dynamically morphs based on login state without crashing.
+
+READING GUIDE:
+- Need to understand how paths communicate? Read: 01_core_architecture_flow.md
+- Preparing for a code review? Read: 05_key_code_snippets_explained.md and 04_codebase_walkthrough.md
+- Preparing to talk about problem-solving? Read: 03_bugs_reasons_and_solutions.md

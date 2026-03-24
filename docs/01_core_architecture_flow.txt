@@ -1,0 +1,43 @@
+# Core Logic & Architectural Flow
+
+This document explains a high-level overview of how the Path4Career bootcamps application functions, detailing the tech stack and the data flow between the client and the server.
+
+## Tech Stack Overview
+
+- **Frontend:** React (Vite build tool), React Router for Single Page Application navigation, Tailwind CSS for UI styling, and Lucide React for iconography.
+- **Backend:** Node.js with Express framework to manage REST API endpoints.
+- **Database:** MongoDB (using Mongoose ODM) to structure relationships between Users, Bootcamps, Modules, Assignments, and Submissions.
+- **Security:** `bcryptjs` for hashing user passwords securely, and `jsonwebtoken` (JWT) for stateless session authentication.
+
+---
+
+## 1. Authentication Data Flow
+
+A core part of the system is identifying who is using the app and what permissions they hold (Student, Mentor, or Admin).
+
+1.  **Registration / Login:** The user submits their email and password from the React frontend (`POST /api/auth/login` or `POST /api/auth/register`).
+2.  **Verification:** The Express backend receives the request. It queries MongoDB for the user, verifies the password hash using `bcrypt`, and generates a JWT payload containing the user's `ID` and `Role`.
+3.  **Local Storage:** The backend sends the JWT back to the frontend. React saves this `token` and the user's profile data inside the browser's `localStorage`.
+4.  **Authorized Requests:** For any subsequent actions (like enrolling in a course), the frontend attaches this token inside an HTTP header (`Authorization: Bearer <token>`). The backend reads this token via middleware (`authMiddleware.js`), decodes the user ID, and securely processes the request.
+
+---
+
+## 2. Bootcamps & Enrollment Flow
+
+1.  **Browsing Bootcamps:** When a user visits the homepage (`Home.jsx`), the frontend makes an unauthenticated `GET /api/bootcamps` call to the server to list all active bootcamps.
+2.  **Selecting a Bootcamp:** Clicking on a track opens detailed information (syllabus, pricing, format), fetched via `GET /api/bootcamps/:id`.
+3.  **Checkout / Enrollment:** 
+    - The user clicks **Enroll Now**.
+    - If logged in, they see the confirmation screen.
+    - Clicking **Confirm Enrollment** triggers an authenticated `POST /api/bootcamps/:id/enroll` request to the backend.
+    - If the backend verifies the JWT token successfully, it finalizes the enrollment transaction and responds with a success status.
+    - The frontend receives the success prompt and auto-redirects the user to their personalized `/dashboard`.
+
+---
+
+## 3. Role-Based View Architecture (RBAC)
+
+To govern what users can see, the Application utilizes a `<ProtectedRoute>` wrapper around major React components.
+
+-   If a user tries to access `/admin` but their token proves they are a `student`, the `ProtectedRoute` intercepts the render and redirects them to their proper `/dashboard`.
+-   The Navigation Bar observes the `localStorage` state. If a token exists, it morphs the "Log In" / "Sign Up" buttons into "Dashboard" / "Log Out" controls, offering a seamless UX.

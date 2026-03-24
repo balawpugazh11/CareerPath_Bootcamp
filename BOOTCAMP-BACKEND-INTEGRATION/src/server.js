@@ -7,6 +7,7 @@ const errorHandler = require('./middleware/errorHandler');
 const bootcampRoutes = require('./routes/bootcampRoutes');
 const authRoutes = require('./routes/authRoutes');
 const connectDB = require('./config/db');
+const { protect } = require('./middleware/authMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -54,11 +55,11 @@ app.use('/api/bootcamps', bootcampRoutes);
 app.use('/api/auth', authRoutes);
 
 // Additional BRD endpoints (Stubs for future integration)
-app.post('/api/bootcamps/:id/enroll', (req, res) => res.json({ success: true, message: 'Enrolled successfully' }));
-app.get('/api/bootcamps/:id/modules', (req, res) => res.json({ success: true, count: 0, data: [] }));
-app.post('/api/assignments/submit', (req, res) => res.json({ success: true, message: 'Assignment submitted' }));
-app.get('/api/users/progress', (req, res) => res.json({ success: true, data: { progress: 0 } }));
-app.get('/api/certificates/download', (req, res) => res.json({ success: true, message: 'Certificate downloaded' }));
+app.post('/api/bootcamps/:id/enroll', protect, (req, res) => res.json({ success: true, message: 'Enrolled successfully' }));
+app.get('/api/bootcamps/:id/modules', protect, (req, res) => res.json({ success: true, count: 0, data: [] }));
+app.post('/api/assignments/submit', protect, (req, res) => res.json({ success: true, message: 'Assignment submitted' }));
+app.get('/api/users/progress', protect, (req, res) => res.json({ success: true, data: { progress: 0 } }));
+app.get('/api/certificates/download', protect, (req, res) => res.json({ success: true, message: 'Certificate downloaded' }));
 
 /**
  * 404 Handler - For undefined routes

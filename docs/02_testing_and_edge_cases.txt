@@ -1,0 +1,26 @@
+# Tested Areas & Handled Edge Cases
+
+This document records the specific integration paths checked by our automated testing agent (QA), alongside common edge cases built to safeguard the application from unexpected misuse.
+
+## 1. Automated Testing (QA Subagent) Paths
+The application underwent a comprehensive end-to-end automated UI test simulating a real human user. The following critical paths were proven stable:
+
+*   **Registration:** A new user (`Tester User`) was successfully created, verifying the database write logic.
+*   **Redirect Triggers:** The system successfully detected the successful authentication payload and routed the test user away from the public auth pages directly to their personalized Dashboard.
+*   **Contextual UI Adaptation:** The Navbar successfully recognized the authenticated session state, hiding the "Sign Up" controls and displaying the localized "Dashboard" and "Log Out" options instead.
+*   **Browsing Catalog:** The QA script successfully loaded data-driven bootcamp cards from the server on the homepage and clicked through into an individual bootcamp syllabus.
+*   **Checkout Logic Verification:** The QA script completed the enrollment checkout form. It verified that the "Confirm enrollment" button successfully submitted a `POST` request, managed the loading state, parsed the success message, and auto-navigated the user back to the dashboard, completing the loop.
+
+---
+
+## 2. Security Edge Cases & Protections Administered
+
+1.  **Anonymous User Enrollment**
+    *   *Edge Case:* A non-logged-in user tries to click "Confirm Enrollment".
+    *   *Protection:* The specific route `POST /api/bootcamps/:id/enroll` requires a valid JWT header via backend middleware. If triggered manually without authentication, the server throws a `401 Unauthorized` HTTP error.
+2.  **Impersonation & Authorization Hopping**
+    *   *Edge Case:* A logged-in `student` manually alters the URL in their browser to visit `/admin` to see privileged dashboards.
+    *   *Protection:* The React `ProtectedRoute.jsx` component evaluates the stored user role (`student`) against the required role array (`['admin']`) attached to that route. It fails the check and immediately force-redirects the user back to `/dashboard` before any sensitive components render.
+3.  **Invalid Form Inputs Logging**
+    *   *Edge Case:* A user attempts to login without an email or wrong password.
+    *   *Protection:* Backend catches the validation error, returns a `400 Bad Request` or `401 Unauthorized`. The React frontend catches this exception via a `try/catch` block and gracefully displays the human-readable error text in a styled red alert box on the login form without breaking the site.

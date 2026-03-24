@@ -25,7 +25,7 @@ export default function Login() {
       
       if (data.user.role === 'admin') navigate('/admin');
       else if (data.user.role === 'mentor') navigate('/mentor');
-      else navigate('/student');
+      else navigate('/dashboard');
     } catch (err) {
       setErrorMsg(err.message);
     }

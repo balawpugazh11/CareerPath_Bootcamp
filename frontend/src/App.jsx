@@ -12,6 +12,7 @@ import AssignmentSubmission from './pages/student/AssignmentSubmission';
 import MentorDashboard from './pages/mentor/MentorDashboard';
 import MentorReview from './pages/mentor/MentorReview';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   return (
@@ -25,12 +26,20 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/bootcamp/:id" element={<BootcampDetail />} />
             <Route path="/bootcamp/:id/enroll" element={<Enrollment />} />
-            <Route path="/dashboard" element={<StudentDashboard />} />
-            <Route path="/learn/:bootcampId" element={<LessonViewer />} />
-            <Route path="/learn/:bootcampId/assignment" element={<AssignmentSubmission />} />
-            <Route path="/mentor" element={<MentorDashboard />} />
-            <Route path="/mentor/review/:reviewId" element={<MentorReview />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route element={<ProtectedRoute roles={['student', 'admin', 'mentor']} />}>
+              <Route path="/dashboard" element={<StudentDashboard />} />
+              <Route path="/learn/:bootcampId" element={<LessonViewer />} />
+              <Route path="/learn/:bootcampId/assignment" element={<AssignmentSubmission />} />
+            </Route>
+            
+            <Route element={<ProtectedRoute roles={['mentor', 'admin']} />}>
+              <Route path="/mentor" element={<MentorDashboard />} />
+              <Route path="/mentor/review/:reviewId" element={<MentorReview />} />
+            </Route>
+            
+            <Route element={<ProtectedRoute roles={['admin']} />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+            </Route>
           </Routes>
         </main>
       </div>

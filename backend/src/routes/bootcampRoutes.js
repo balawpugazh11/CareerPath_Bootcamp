@@ -13,11 +13,16 @@ const {
   handleValidationErrors,
 } = require('../middleware/validation');
 
+const { protect, authorize } = require('../middleware/authMiddleware');
+
 const router = express.Router();
 
+// GET all bootcamps
 router.get('/', getBootcamps);
 router.post(
   '/',
+  protect,
+  authorize('admin'),
   bootcampValidationRules(),
   handleValidationErrors,
   createBootcamp
@@ -30,6 +35,8 @@ router.get(
 );
 router.put(
   '/:id',
+  protect,
+  authorize('admin'),
   bootcampIdValidationRules(),
   bootcampValidationRules(),
   handleValidationErrors,
@@ -37,6 +44,8 @@ router.put(
 );
 router.delete(
   '/:id',
+  protect,
+  authorize('admin'),
   bootcampIdValidationRules(),
   handleValidationErrors,
   deleteBootcamp

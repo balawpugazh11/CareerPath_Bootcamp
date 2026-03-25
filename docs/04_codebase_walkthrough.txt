@@ -1,0 +1,31 @@
+# Codebase Tour: Understanding the Project Structure
+
+To truly own the code built with AI, you need to understand where everything lives and what each folder's responsibility is. This document acts as your map to the codebase.
+
+## 1. The Backend (`BOOTCAMP-BACKEND-INTEGRATION/src`)
+
+The backend is built using the **MVC (Model-View-Controller)** pattern, which is the industry standard for Express APIs. (Although we don't have "Views" since React handles that, the structure remains).
+
+*   **`server.js`**: The heart of the application. This is the entry point. It sets up the server port, applies global security settings (`helmet`, `cors`), connects the database (`connectDB()`), and binds the URLs (`/api/auth`) to their specific route files.
+*   **`config/db.js`**: Contains the logic to connect to your MongoDB database using Mongoose.
+*   **`models/`**: Defines the shapes of your database collections. 
+    *   *Example:* `User.js` enforces that every user has a string `email` and a string `password_hash`. It acts as the gatekeeper preventing bad data from entering your DB.
+*   **`controllers/`**: This is where the actual "business logic" lives. 
+    *   *Example:* Inside `authController.js`, you'll find the step-by-step logic for taking a password, hashing it, saving it to the database, and returning a token. Our controllers do the heavy lifting.
+*   **`routes/`**: Think of these as the traffic cops. They don't do the heavy lifting; instead, they map a URL (like `POST /register`) to the correct controller function (like `register() from authController.js`).
+*   **`middleware/`**: Functions that run *between* the request coming in and the controller firing. 
+    *   *Example:* `authMiddleware.js` intercepts requests to protected routes, checks the token, and either lets the traffic pass through (`next()`) or blocks it (`401 Unauthorized`).
+
+---
+
+## 2. The Frontend (`CareerPath_Bootcamp-frontend-ui/frontend/src`)
+
+The frontend is a **React Single Page Application (SPA)** managed by Vite.
+
+*   **`main.jsx`**: The React entry point that injects your React App into the real HTML DOM (`index.html`).
+*   **`App.jsx`**: Your routing table. It uses `react-router-dom` to dictate which Component is shown based on the URL in the browser (e.g., if the URL is `/login`, render the `<Login />` component).
+*   **`pages/`**: These represent entire screens that a user navigates to.
+    *   *Example:* `Home.jsx`, `Login.jsx`, `BootcampDetail.jsx`. These are "smart" components that usually make API network calls (`fetch`) to get data.
+*   **`components/`**: Smaller, reusable UI building blocks that are placed *inside* pages.
+    *   *Example:* `Navbar.jsx` (which appears on every page) or `ProtectedRoute.jsx` (which wraps around sensitive pages to block logged-out users).
+*   **`data/`**: Contains static mock data used while the backend is being fully built (like the dummy dashboard data in `platformData.js`).

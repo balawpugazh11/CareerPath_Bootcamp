@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { CalendarDays, CheckCircle2, CreditCard, ShieldCheck, Users } from 'lucide-react';
 import { useBootcamps } from '../hooks/useBootcamps';
 
@@ -12,7 +12,37 @@ const enrollmentSteps = [
 export default function Enrollment() {
   const { id } = useParams();
   const { bootcamps } = useBootcamps();
-  const bootcamp = bootcamps.find((item) => item.id === id) ?? bootcamps[0];
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+
+  const bootcamp = bootcamps.find((item) => String(item.id) === String(id)) ?? bootcamps[0];
+
+  const handleEnroll = async () => {
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Please log in to enroll.');
+      
+      const response = await fetch(`http://localhost:5000/api/bootcamps/${id}/enroll`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Enrollment failed');
+      
+      setSuccessMsg('Successfully enrolled! Redirecting to dashboard...');
+      setTimeout(() => navigate('/dashboard'), 2000);
+    } catch (err) {
+      setErrorMsg(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 py-10">
@@ -115,11 +145,17 @@ export default function Enrollment() {
                     </div>
                   </div>
 
-                  <button className="mt-6 w-full rounded-xl bg-cyan-700 hover:bg-cyan-800 text-white font-semibold px-6 py-4 transition-colors">
-                    Confirm enrollment
+                  {errorMsg && <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">{errorMsg}</div>}
+                  {successMsg && <div className="mt-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm">{successMsg}</div>}
+                  <button 
+                    onClick={handleEnroll}
+                    disabled={loading || successMsg}
+                    className="mt-6 w-full rounded-xl bg-cyan-700 hover:bg-cyan-800 disabled:opacity-50 text-white font-semibold px-6 py-4 transition-colors"
+                  >
+                    {loading ? 'Processing...' : 'Confirm enrollment'}
                   </button>
                   <p className="mt-3 text-sm text-slate-500 text-center">
-                    Demo frontend flow only. Payment and confirmation are not connected yet.
+                    Payment simulation. Proceeding will confirm your enrollment.
                   </p>
                 </div>
               </div>

@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const logger = require('./middleware/logger');
 const errorHandler = require('./middleware/errorHandler');
 const bootcampRoutes = require('./routes/bootcampRoutes');
+const authRoutes = require('./routes/authRoutes');
 const connectDB = require('./config/db');
 
 const app = express();
@@ -36,6 +37,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/bootcamps', bootcampRoutes);
+app.use('/api/auth', authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
@@ -50,6 +52,8 @@ app.use((req, res) => {
       'GET /api/bootcamps/:id',
       'PUT /api/bootcamps/:id',
       'DELETE /api/bootcamps/:id',
+      'POST /api/auth/register',
+      'POST /api/auth/login',
     ],
   });
 });

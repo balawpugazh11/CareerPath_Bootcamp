@@ -12,6 +12,7 @@ import AssignmentSubmission from './pages/student/AssignmentSubmission';
 import MentorDashboard from './pages/mentor/MentorDashboard';
 import MentorReview from './pages/mentor/MentorReview';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AddBootcamp from './pages/admin/AddBootcamp';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
             
             <Route element={<ProtectedRoute roles={['admin']} />}>
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/bootcamps/add" element={<AddBootcamp />} />
             </Route>
           </Routes>
         </main>

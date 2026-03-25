@@ -26,6 +26,7 @@ The frontend is a **React Single Page Application (SPA)** managed by Vite.
 *   **`App.jsx`**: Your routing table. It uses `react-router-dom` to dictate which Component is shown based on the URL in the browser (e.g., if the URL is `/login`, render the `<Login />` component).
 *   **`pages/`**: These represent entire screens that a user navigates to.
     *   *Example:* `Home.jsx`, `Login.jsx`, `BootcampDetail.jsx`. These are "smart" components that usually make API network calls (`fetch`) to get data.
+    *   **`admin/AdminDashboard.jsx`**: A mission-critical "Full-CRUD" component. It doesn't just display data; it manages the state of the entire platform's offerings. It uses React's `useEffect` to populate its listings and integrates a secure delete mechanism that talks directly to the restricted admin API endpoints.
 *   **`components/`**: Smaller, reusable UI building blocks that are placed *inside* pages.
     *   *Example:* `Navbar.jsx` (which appears on every page) or `ProtectedRoute.jsx` (which wraps around sensitive pages to block logged-out users).
 *   **`data/`**: Contains static mock data used while the backend is being fully built (like the dummy dashboard data in `platformData.js`).

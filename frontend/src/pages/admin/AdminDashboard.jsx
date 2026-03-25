@@ -1,62 +1,229 @@
-import React from 'react';
-import { LayoutDashboard, BookText, Settings, Plus } from 'lucide-react';
-import { adminDashboard } from '../../data/platformData';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, BookText, Settings, Plus, AlertCircle, Loader2, Users, BookOpen, TrendingUp, Trash2, Edit } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const { bootcamps, metrics } = adminDashboard;
+  const navigate = useNavigate();
+  const [bootcamps, setBootcamps] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [activeNav, setActiveNav] = useState('overview');
+  const [deleteLoading, setDeleteLoading] = useState(null);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  const fetchBootcamps = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch('http://localhost:5000/api/bootcamps');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch bootcamps.');
+      setBootcamps(data.data || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBootcamps();
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this bootcamp?')) return;
+    setDeleteLoading(id);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/bootcamps/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Delete failed.');
+      setBootcamps((prev) => prev.filter((bc) => bc._id !== id));
+    } catch (err) {
+      alert('Error: ' + err.message);
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
+
+  const metrics = [
+    { label: 'Total Bootcamps', value: loading ? '…' : bootcamps.length, icon: BookOpen },
+    { label: 'Total Students', value: '—', icon: Users },
+    { label: 'Active Cohorts', value: loading ? '…' : bootcamps.length, icon: TrendingUp },
+  ];
+
+  const navItems = [
+    { key: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { key: 'curriculums', label: 'Curriculums', icon: BookText },
+    { key: 'settings', label: 'Settings', icon: Settings },
+  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Admin Control Panel</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors">
-          <Plus className="w-5 h-5"/> New Bootcamp
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Admin Control Panel</h1>
+          <p className="text-gray-500 text-sm mt-1">Welcome, {user?.name || 'Admin'}</p>
+        </div>
+        <button
+          onClick={() => navigate('/admin/bootcamps/add')}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
+        >
+          <Plus className="w-5 h-5" /> New Bootcamp
         </button>
       </div>
 
+      {/* Metrics */}
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         {metrics.map((metric) => (
-          <div key={metric.label} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div className="text-3xl font-black text-gray-900">{metric.value}</div>
-            <div className="mt-2 text-sm font-medium text-gray-500">{metric.label}</div>
+          <div key={metric.label} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="bg-blue-50 p-3 rounded-xl">
+              <metric.icon className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <div className="text-3xl font-black text-gray-900">{metric.value}</div>
+              <div className="mt-0.5 text-sm font-medium text-gray-500">{metric.label}</div>
+            </div>
           </div>
         ))}
       </div>
 
       <div className="grid lg:grid-flow-col gap-8">
-        <div className="col-span-1 lg:w-64 space-y-2">
-          <div className="bg-blue-50 text-blue-700 px-4 py-3 rounded-lg font-bold flex items-center gap-3 cursor-pointer">
-            <LayoutDashboard className="w-5 h-5"/> Overview
-          </div>
-          <div className="text-gray-600 hover:bg-gray-50 px-4 py-3 rounded-lg font-medium flex items-center gap-3 cursor-pointer transition-colors">
-            <BookText className="w-5 h-5"/> Curriculums
-          </div>
-          <div className="text-gray-600 hover:bg-gray-50 px-4 py-3 rounded-lg font-medium flex items-center gap-3 cursor-pointer transition-colors">
-            <Settings className="w-5 h-5"/> Settings
-          </div>
+        {/* Sidebar Nav */}
+        <div className="col-span-1 lg:w-56 space-y-1">
+          {navItems.map((item) => (
+            <div
+              key={item.key}
+              onClick={() => setActiveNav(item.key)}
+              className={`px-4 py-3 rounded-lg font-medium flex items-center gap-3 cursor-pointer transition-colors ${
+                activeNav === item.key
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <item.icon className="w-5 h-5" />
+              {item.label}
+            </div>
+          ))}
         </div>
 
+        {/* Main Content */}
         <div className="lg:col-span-3">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Manage Bootcamps</h2>
-          <div className="grid gap-4">
-            {bootcamps.map(bc => (
-              <div key={bc.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow">
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-xl font-bold text-gray-900">{bc.title}</h3>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${bc.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
-                      {bc.status}
-                    </span>
-                  </div>
-                  <div className="text-gray-500 text-sm font-medium">{bc.students} Enrolled Students</div>
-                </div>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 border border-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">Edit</button>
-                  <button className="px-4 py-2 border border-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">Manage Curriculum</button>
-                </div>
+          {activeNav === 'overview' && (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Manage Bootcamps</h2>
+                {!loading && (
+                  <span className="text-sm text-gray-400 font-medium">
+                    {`${bootcamps.length} bootcamp${bootcamps.length !== 1 ? 's' : ''} total`}
+                  </span>
+                )}
               </div>
-            ))}
-          </div>
+
+              {loading && (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                  <span className="ml-3 text-gray-500 font-medium">Loading bootcamps...</span>
+                </div>
+              )}
+
+              {error && !loading && (
+                <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <div>
+                    <p className="font-medium">Failed to load bootcamps</p>
+                    <p className="text-sm mt-0.5">{error}</p>
+                  </div>
+                  <button
+                    onClick={fetchBootcamps}
+                    className="ml-auto text-sm font-medium text-red-600 hover:text-red-800 underline"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {!loading && !error && bootcamps.length === 0 && (
+                <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 border-dashed">
+                  <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <h3 className="text-gray-600 font-semibold text-lg">No bootcamps yet</h3>
+                  <p className="text-gray-400 text-sm mt-1 mb-5">Create your first bootcamp to get started.</p>
+                  <button
+                    onClick={() => navigate('/admin/bootcamps/add')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium text-sm transition-colors inline-flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" /> Add First Bootcamp
+                  </button>
+                </div>
+              )}
+
+              {!loading && !error && bootcamps.length > 0 && (
+                <div className="grid gap-4">
+                  {bootcamps.map((bc) => (
+                    <div
+                      key={bc._id}
+                      className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow"
+                    >
+                      <div>
+                        <div className="flex items-center gap-3 mb-1">
+                          <h3 className="text-lg font-bold text-gray-900">{bc.title || bc.name}</h3>
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+                            Active
+                          </span>
+                          {bc.level && (
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                              {bc.level}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex gap-4 text-gray-400 text-xs font-medium mt-1">
+                          {bc.duration && <span>⏱ {bc.duration}</span>}
+                          {bc.price && <span>💰 {bc.price}</span>}
+                          {bc.format && <span>📡 {bc.format}</span>}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 shrink-0 ml-4">
+                        <button className="px-3 py-1.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5">
+                          <Edit className="w-3.5 h-3.5" /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(bc._id)}
+                          disabled={deleteLoading === bc._id}
+                          className="px-3 py-1.5 border border-red-200 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors flex items-center gap-1.5 disabled:opacity-40"
+                        >
+                          {deleteLoading === bc._id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-3.5 h-3.5" />
+                          )}
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {activeNav === 'curriculums' && (
+            <div className="py-16 text-center bg-white rounded-2xl border border-gray-100 shadow-sm">
+              <BookText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <h3 className="text-gray-900 font-semibold text-lg">Curriculums</h3>
+              <p className="text-gray-500 text-sm mt-1">Curriculum management is coming soon.</p>
+            </div>
+          )}
+
+          {activeNav === 'settings' && (
+            <div className="py-16 text-center bg-white rounded-2xl border border-gray-100 shadow-sm">
+              <Settings className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <h3 className="text-gray-900 font-semibold text-lg">Settings</h3>
+              <p className="text-gray-500 text-sm mt-1">Dashboard settings are coming soon.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

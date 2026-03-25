@@ -23,3 +23,12 @@ During the audit of the application's foundational layout and backend logic, sev
 *   **The Bug:** The `Navbar.jsx` permanently displayed "Log In" and "Sign Up," even if the user had just successfully authenticated and was browsing their dashboard.
 *   **The Reason:** The component was purely presentational and lacked state awareness.
 *   **The Solution:** A logical check was implemented by interpreting the existing `token` from `localStorage`. Using React conditional rendering (`{token ? ( ... ) : ( ... )}`), the navbar seamlessly swaps the authentication buttons for a contextual role-based dashboard link and a working `Log Out` button function that correctly flushes local storage and reloads the homepage.
+## Bug 5: Static Admin Dashboard
+*   **The Bug:** The Admin Dashboard was initially built using static mock data from `platformData.js`. Adding or deleting bootcamps in the UI did not persist or interact with the real database.
+*   **The Reason:** The dashboard was a frontend-only prototype and hadn't been integrated with the `GET /api/bootcamps` and `DELETE /api/bootcamps/:id` endpoints.
+*   **The Solution:** Refactored `AdminDashboard.jsx` to use `useState` and `useEffect`. Implemented a `fetchBootcamps` function that pulls live data from the backend on mount. This ensures administrators see the actual system state, not mock placeholders.
+
+## Bug 6: Delete Action Risk
+*   **The Bug:** Clicking the "Delete" button on a bootcamp entry would immediately trigger the API call without asking for confirmation, leading to accidental data loss.
+*   **The Reason:** Missing user experience (UX) safeguards in the initial event handler.
+*   **The Solution:** Added a `window.confirm()` guard clause to the `handleDelete` function. The API request now only fires if the user explicitly confirms the action. Additionally, added a `deleteLoading` state to provide visual feedback (spinners) while the request is in flight.

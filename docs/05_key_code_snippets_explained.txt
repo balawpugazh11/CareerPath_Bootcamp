@@ -1,6 +1,6 @@
 # Master the Code: Key Snippets Explained
 
-To speak confidently about this build, you should understand how the most important pieces of code actually work line-by-line. Here are three critical snippets explained in plain English.
+To speak confidently about this build, you should understand how the most important pieces of code actually work line-by-line. Here are four critical snippets explained in plain English.
 
 ---
 
@@ -75,3 +75,31 @@ const ProtectedRoute = ({ roles }) => {
 
 **Why you built it this way:**
 "I built a custom Higher Order Component (HOC) called `ProtectedRoute` leveraging React Router's `<Outlet />` API. Instead of writing authentication logic on every single page, I wrap my sensitive routes in `App.jsx` with this component. It inspects `localStorage` instantly; if you don't have a token, it acts as a firewall and redirects you before the sensitive UI even has a chance to render."
+
+---
+
+## 4. How the Admin Deletes Data Securely (Frontend)
+
+**File:** `src/pages/admin/AdminDashboard.jsx` (Inside `handleDelete`)
+
+```javascript
+const handleDelete = async (id) => {
+  // 1. UX Guard: Ensure the action is intentional
+  if (!window.confirm('Are you sure you want to delete this bootcamp?')) return;
+
+  // 2. Security: Attach the JWT token to the request headers
+  const token = localStorage.getItem('token');
+  const response = await fetch(`http://localhost:5000/api/bootcamps/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  // 3. State Management: Remove the deleted item from the UI instantly
+  if (response.ok) {
+    setBootcamps((prev) => prev.filter((bc) => bc._id !== id));
+  }
+};
+```
+
+**Why you built it this way:**
+"I implemented a 'Safe Delete' flow. First, a confirmation dialog prevents accidents. Second, it sends a signed JWT token in the header; the backend will reject this call if the user isn't a verified Admin. Finally, I use an optimistic state update to filter the deleted bootcamp out of the React state array, providing the user with instant visual confirmation."

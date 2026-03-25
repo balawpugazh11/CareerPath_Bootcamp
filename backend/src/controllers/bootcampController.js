@@ -24,16 +24,12 @@ exports.getBootcamps = async (req, res) => {
 
 exports.createBootcamp = async (req, res) => {
   try {
-    const bootcamp = new Bootcamp({
-      name: req.body.name,
-    });
-
-    const savedBootcamp = await bootcamp.save();
+    const bootcamp = await Bootcamp.create(req.body);
 
     res.status(201).json({
       success: true,
       message: 'Bootcamp created successfully',
-      data: savedBootcamp,
+      data: bootcamp,
     });
   } catch (error) {
     console.error('POST /bootcamps error:', error);

@@ -186,7 +186,10 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                       <div className="flex gap-2 shrink-0 ml-4">
-                        <button className="px-3 py-1.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5">
+                        <button
+                          onClick={() => navigate(`/admin/bootcamps/edit/${bc._id}`)}
+                          className="px-3 py-1.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+                        >
                           <Edit className="w-3.5 h-3.5" /> Edit
                         </button>
                         <button

@@ -109,7 +109,7 @@ exports.updateBootcamp = async (req, res) => {
 
     const bootcamp = await Bootcamp.findByIdAndUpdate(
       req.params.id,
-      { name: req.body.name },
+      req.body,
       { new: true, runValidators: true }
     );
 

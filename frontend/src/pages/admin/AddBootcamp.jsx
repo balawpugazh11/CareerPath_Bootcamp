@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { BookPlus, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { BookPlus, ArrowLeft, Loader2, Save } from 'lucide-react';
 
 export default function AddBootcamp() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = !!id;
+  
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(isEdit);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     name: '',
@@ -19,6 +23,37 @@ export default function AddBootcamp() {
     summary: '',
   });
 
+  useEffect(() => {
+    if (isEdit) {
+      const fetchBootcamp = async () => {
+        try {
+          const response = await fetch(`http://localhost:5000/api/bootcamps/${id}`);
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || 'Failed to fetch bootcamp details.');
+          
+          const bc = data.data;
+          setForm({
+            name: bc.name || '',
+            title: bc.title || '',
+            description: bc.description || '',
+            level: bc.level || 'Beginner',
+            duration: bc.duration || '',
+            price: bc.price || '',
+            format: bc.format || 'Live Online',
+            cohortStart: bc.cohortStart || '',
+            paymentPlan: bc.paymentPlan || '',
+            summary: bc.summary || '',
+          });
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setFetching(false);
+        }
+      };
+      fetchBootcamp();
+    }
+  }, [id, isEdit]);
+
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -29,8 +64,13 @@ export default function AddBootcamp() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/bootcamps', {
-        method: 'POST',
+      const url = isEdit 
+        ? `http://localhost:5000/api/bootcamps/${id}` 
+        : 'http://localhost:5000/api/bootcamps';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -38,7 +78,7 @@ export default function AddBootcamp() {
         body: JSON.stringify(form),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to create bootcamp.');
+      if (!response.ok) throw new Error(data.message || `Failed to ${isEdit ? 'update' : 'create'} bootcamp.`);
       navigate('/admin');
     } catch (err) {
       setError(err.message);
@@ -61,15 +101,24 @@ export default function AddBootcamp() {
       </button>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="bg-blue-100 p-2.5 rounded-xl">
-            <BookPlus className="w-6 h-6 text-blue-600" />
+        {fetching ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
+            <p className="text-gray-500 font-medium">Loading bootcamp details...</p>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Add New Bootcamp</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Fill in the details to publish a new bootcamp to the catalog.</p>
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="bg-blue-100 p-2.5 rounded-xl">
+                {isEdit ? <Save className="w-6 h-6 text-blue-600" /> : <BookPlus className="w-6 h-6 text-blue-600" />}
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{isEdit ? 'Edit Bootcamp' : 'Add New Bootcamp'}</h1>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {isEdit ? 'Update the details of the existing bootcamp.' : 'Fill in the details to publish a new bootcamp to the catalog.'}
+                </p>
+              </div>
+            </div>
 
         {error && (
           <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
@@ -190,25 +239,27 @@ export default function AddBootcamp() {
             </div>
           </div>
 
-          <div className="pt-2 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => navigate('/admin')}
-              className="px-5 py-2.5 border border-gray-200 text-gray-600 font-medium rounded-lg hover:bg-gray-50 transition-colors text-sm"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm flex items-center gap-2 disabled:opacity-60"
-            >
-              <BookPlus className="w-4 h-4" />
-              {loading ? 'Publishing...' : 'Publish Bootcamp'}
-            </button>
-          </div>
-        </form>
-      </div>
+            <div className="pt-2 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => navigate('/admin')}
+                className="px-5 py-2.5 border border-gray-200 text-gray-600 font-medium rounded-lg hover:bg-gray-50 transition-colors text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm flex items-center gap-2 disabled:opacity-60"
+              >
+                {isEdit ? <Save className="w-4 h-4" /> : <BookPlus className="w-4 h-4" />}
+                {loading ? (isEdit ? 'Updating...' : 'Publishing...') : (isEdit ? 'Update Bootcamp' : 'Publish Bootcamp')}
+              </button>
+            </div>
+          </form>
+        </>
+      )}
     </div>
-  );
+  </div>
+);
 }

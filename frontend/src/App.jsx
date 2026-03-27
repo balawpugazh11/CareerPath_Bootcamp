@@ -41,6 +41,7 @@ function App() {
             <Route element={<ProtectedRoute roles={['admin']} />}>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/bootcamps/add" element={<AddBootcamp />} />
+              <Route path="/admin/bootcamps/edit/:id" element={<AddBootcamp />} />
             </Route>
           </Routes>
         </main>
